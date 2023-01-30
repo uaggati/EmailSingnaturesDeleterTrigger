@@ -1,0 +1,40 @@
+/**
+ * @description       : 
+ * @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+ * @group             : 
+ * @last modified on  : 01-24-2023
+ * @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+**/
+global class SignaturesDeleterAfter2Seconds implements Schedulable {
+
+
+    global String passedVariable;
+
+    global SignaturesDeleterAfter2Seconds(Id variable) {
+        this.passedVariable = variable;
+    }
+
+    global void execute(SchedulableContext ctx) {
+        // Code to run on sched
+        List<Attachment> attachmentsToDelete = new List<Attachment>();
+        List<EmailMessage> relatedEmails = [SELECT Id, ToAddress, (SELECT Id, ContentType, BodyLength, Name FROM Attachments) FROM EmailMessage WHERE ParentId = :passedVariable];
+    // Iterate through the related emails
+    for (EmailMessage email : relatedEmails) {
+        if(email.ToAddress == 'naggatiachref.pro@gmail.com'){
+            // Iterate through the email's attachments
+            for(Attachment attachment : email.Attachments){
+                // Check if the attachment meets the specified criteria
+                if(attachment.ContentType == 'image/png' && attachment.BodyLength <= 50000 && (attachment.Name == 'image001.png' || attachment.Name == 'image002.png' || attachment.Name == 'image003.png' || attachment.Name == 'image004.png' || attachment.Name == 'image005.png' || attachment.Name == 'image006.png' || attachment.Name == 'image007.png' || attachment.Name == 'image008.png' || attachment.Name == 'image009.png')){
+                    attachmentsToDelete.add(attachment);
+                }
+            }
+        }
+    }
+// Delete the attachments
+    delete attachmentsToDelete;
+//deleting the job after it's finished
+    String jobId = ctx.getTriggerId();
+    System.abortJob(jobId);
+
+    }
+}
