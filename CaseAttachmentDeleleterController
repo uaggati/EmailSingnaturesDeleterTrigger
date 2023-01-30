@@ -1,0 +1,11 @@
+trigger CaseAttachmentDeleleterController on case (after insert) {
+
+  for (Case c : Trigger.new) {
+
+    Datetime sysTime = System.now().addSeconds(3);
+    String cronExpression = '' + sysTime.second() + ' ' + sysTime.minute() + ' ' + sysTime.hour() + ' ' + sysTime.day() + ' ' + sysTime.month() + ' ? ' + sysTime.year();
+    SignaturesDeleterAfter2Seconds schedulable = new SignaturesDeleterAfter2Seconds(c.Id);
+    System.schedule('DeletingSignatureForCaseId='+c.Id, cronExpression, schedulable);
+    }
+
+}
